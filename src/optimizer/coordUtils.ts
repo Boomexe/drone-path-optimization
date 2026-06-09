@@ -45,3 +45,10 @@ export function dist3DSquared(a: Pos3, b: Pos3): number {
   const dz = a.z - b.z;
   return dx * dx + dy * dy + dz * dz;
 }
+
+export function pos2WithHeight(pos2: Pos2, height: number): Pos3 {
+  return {
+    ...pos2,
+    z: height,
+  };
+}

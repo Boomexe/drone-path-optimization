@@ -1,12 +1,12 @@
 import type { Input } from "../../optimizer/types";
 
 export const sampleInput: Input = {
-  start: {
+  origin: {
     lat: 37.333,
     lon: -121.891,
     height: 0,
   },
-  end: {
+  destination: {
     lat: 37.341,
     lon: -121.879,
     height: 0,

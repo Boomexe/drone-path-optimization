@@ -16,12 +16,13 @@ export type Pos3 = Pos2 & {
   z: number;
 };
 
-export type Node = {
+// "Node" is taken lol
+export type GraphNode = {
   id: number;
   pos: Pos3;
 };
 
-export type Edge = {
+export type GraphEdge = {
   from: number;
   to: number;
   cost: number;
@@ -47,9 +48,11 @@ export type ObstacleXYZ = {
   points: Pos3[];
 };
 
+export type InputTypes = Input | NormalizedInput;
+
 export type Input = {
-  start: LatLonHeight;
-  end: LatLonHeight;
+  origin: LatLonHeight;
+  destination: LatLonHeight;
 
   floor: number;
   ceiling: number;
@@ -59,10 +62,13 @@ export type Input = {
 
 export type NormalizedInput = {
   origin: LatLon;
+
   start: Pos3;
   end: Pos3;
+
   floor: number;
   ceiling: number;
+
   obstacles: ObstacleXY[];
 };
 
