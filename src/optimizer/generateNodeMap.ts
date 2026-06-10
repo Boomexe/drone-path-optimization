@@ -28,16 +28,9 @@ function generateOffsetPoints(
 }
 
 export function generateNodeMap(input: NormalizedInput): GraphNode[] {
-  const offsetPoints: Pos2[] = [];
-
-  for (const obstacle of input.obstacles) {
-    const points = generateOffsetPoints(obstacle, OFFSET);
-    offsetPoints.push(...points);
-  }
-
-  const heights = generateHeightLayers(input);
-
   const nodes: GraphNode[] = [];
+
+  const globalHeights = generateGlobalHeightLayers(input);
 
   nodes.push({
     id: nodes.length,
@@ -51,8 +44,8 @@ export function generateNodeMap(input: NormalizedInput): GraphNode[] {
     kind: "end",
   });
 
-  // Extra heights at the start and end positions
-  for (const height of heights) {
+  // Extra heights at the start position
+  for (const height of globalHeights) {
     if (height === input.start.z) continue;
 
     nodes.push({
@@ -66,7 +59,8 @@ export function generateNodeMap(input: NormalizedInput): GraphNode[] {
     });
   }
 
-  for (const height of heights) {
+  // Extra heights at the end position
+  for (const height of globalHeights) {
     if (height === input.end.z) continue;
 
     nodes.push({
@@ -80,34 +74,54 @@ export function generateNodeMap(input: NormalizedInput): GraphNode[] {
     });
   }
 
-  for (const point of offsetPoints) {
-    for (const height of heights) {
-      nodes.push({
-        id: nodes.length,
-        pos: pos2WithHeight(point, height),
-        kind: "obstacle",
-      });
+  // Obstacle waypoints get only their own local height layers
+  for (const obstacle of input.obstacles) {
+    const offsetPoints = generateOffsetPoints(obstacle, OFFSET);
+    const obstacleHeights = generateObstacleHeightLayers(input, obstacle);
+
+    for (const point of offsetPoints) {
+      for (const height of obstacleHeights) {
+        nodes.push({
+          id: nodes.length,
+          pos: pos2WithHeight(point, height),
+          kind: "obstacle",
+        });
+      }
     }
   }
 
   return nodes;
 }
 
-function generateHeightLayers(input: NormalizedInput): number[] {
+function generateGlobalHeightLayers(input: NormalizedInput): number[] {
   const heights = new Set<number>();
 
-  heights.add(input.floor);
-  heights.add(input.ceiling);
   heights.add(input.start.z);
   heights.add(input.end.z);
+  heights.add(input.ceiling);
 
-  for (const obstacle of input.obstacles) {
-    const clearanceHeight = obstacle.height;
+  return [...heights]
+    .filter((height) => height >= input.floor && height <= input.ceiling)
+    .sort((a, b) => a - b);
+}
 
-    if (clearanceHeight >= input.floor && clearanceHeight <= input.ceiling) {
-      heights.add(clearanceHeight);
-    }
+function generateObstacleHeightLayers(
+  input: NormalizedInput,
+  obstacle: ObstacleXY,
+): number[] {
+  const heights = new Set<number>();
+
+  heights.add(input.start.z);
+  heights.add(input.end.z);
+  heights.add(input.ceiling);
+
+  const obstacleHeight = obstacle.height;
+
+  if (obstacleHeight >= input.floor && obstacleHeight <= input.ceiling) {
+    heights.add(obstacleHeight);
   }
 
-  return [...heights].sort((a, b) => a - b);
+  return [...heights]
+    .filter((height) => height >= input.floor && height <= input.ceiling)
+    .sort((a, b) => a - b);
 }

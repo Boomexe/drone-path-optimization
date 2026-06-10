@@ -1,0 +1,2 @@
+- check for duplicated nodes (most cases there probably isn't enough to justify checking)
+- 

@@ -23,8 +23,8 @@ function makeRectangleObstacle(
 
 const obstacles: ObstacleXY[] = [];
 
-const columns = 8;
-const rows = 8;
+const columns = 20;
+const rows = 12;
 
 // Creates exactly 20 * 10 = 200 obstacles.
 for (let row = 0; row < rows; row++) {
@@ -39,7 +39,8 @@ for (let row = 0; row < rows; row++) {
 
     // Varied obstacle heights, all below ceiling.
     // Some can be flown over, some are taller and encourage going around.
-    const obstacleHeight = 15 + ((row * 7 + col * 11) % 55);
+    // const obstacleHeight = 15 + ((row * 7 + col * 11) % 55);
+    const obstacleHeight = 1000;
 
     obstacles.push(
       makeRectangleObstacle(

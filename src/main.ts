@@ -2,6 +2,7 @@ import { largeInput } from "./data/test-cases/largeTest";
 import { sampleNormalizedInput } from "./data/test-cases/normalizedtest1";
 import { sampleInput } from "./data/test-cases/test1";
 import { astar } from "./optimizer/astar";
+import { countDuplicateNodes } from "./optimizer/duplicateNodes";
 import { generateNodeMap } from "./optimizer/generateNodeMap";
 import { buildGraphEdges } from "./optimizer/graphEdges";
 import { getNormalizedInput } from "./optimizer/inputHandling";
@@ -15,10 +16,13 @@ import type {
 
 const startTime = performance.now()
 
-const normalizedInput = getNormalizedInput(largeInput);
+const normalizedInput = getNormalizedInput(sampleInput);
 console.time("nodes");
 const nodes = generateNodeMap(normalizedInput);
 console.timeEnd("nodes");
+
+// const duplicateCount = countDuplicateNodes(nodes);
+// console.log(`duplicate: ${duplicateCount.duplicateNodes}, unique: ${duplicateCount.uniqueNodes}, total: ${duplicateCount.totalNodes} nodes`);
 
 console.time("edges");
 const edges = buildGraphEdges(nodes, normalizedInput.obstacles);
