@@ -1,4 +1,4 @@
-import type { GraphNode, ObstacleXY, Pos2, Pos3 } from "./types";
+import type { GraphNode, ObstacleXY, Pos2 } from "./types";
 
 const EPSILON = 1e-9;
 
@@ -71,12 +71,6 @@ function isPointInPolygon2D(point: Pos2, polygonPoints: Pos2[]): boolean {
   }
 
   return isInside;
-}
-
-function isPointInObstacle(point: Pos3, obstacle: ObstacleXY): boolean {
-  if (point.z > obstacle.height) return false;
-
-  return isPointInPolygon2D(point, obstacle.points);
 }
 
 function orientation(a: Pos2, b: Pos2, c: Pos2): number {

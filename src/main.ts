@@ -1,8 +1,9 @@
-import { largeInput } from "./data/test-cases/largeTest";
-import { sampleNormalizedInput } from "./data/test-cases/normalizedtest1";
-import { sampleInput } from "./data/test-cases/test1";
+import { newYorkInput } from "./data/test-cases/newYork";
+import { largeInput } from "./data/test-cases/old/largeTest";
+import { octagonTest } from "./data/test-cases/old/octagonTest";
+import { parisInput } from "./data/test-cases/paris";
+import { sanFranciscoInput } from "./data/test-cases/sanFrancisco";
 import { astar } from "./optimizer/astar";
-import { countDuplicateNodes } from "./optimizer/duplicateNodes";
 import { generateNodeMap } from "./optimizer/generateNodeMap";
 import { buildGraphEdges } from "./optimizer/graphEdges";
 import { getNormalizedInput } from "./optimizer/inputHandling";
@@ -16,7 +17,7 @@ import type {
 
 const startTime = performance.now()
 
-const normalizedInput = getNormalizedInput(largeInput);
+const normalizedInput = getNormalizedInput(parisInput);
 console.time("nodes");
 const nodes = generateNodeMap(normalizedInput);
 console.timeEnd("nodes");

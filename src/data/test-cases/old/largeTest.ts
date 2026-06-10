@@ -1,4 +1,4 @@
-import type { NormalizedInput, ObstacleXY } from "../../optimizer/types";
+import type { NormalizedInput, ObstacleXY } from "../../../optimizer/types";
 
 function makeRectangleObstacle(
   id: string,
@@ -24,7 +24,7 @@ function makeRectangleObstacle(
 const obstacles: ObstacleXY[] = [];
 
 const columns = 20;
-const rows = 12;
+const rows = 20;
 
 // Creates exactly 20 * 10 = 200 obstacles.
 for (let row = 0; row < rows; row++) {

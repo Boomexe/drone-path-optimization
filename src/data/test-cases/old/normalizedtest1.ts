@@ -1,4 +1,4 @@
-import type { Input, NormalizedInput } from "../../optimizer/types";
+import type { NormalizedInput } from "../../../optimizer/types";
 
 export const sampleNormalizedInput: NormalizedInput = {
   origin: {

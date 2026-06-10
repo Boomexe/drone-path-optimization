@@ -1,4 +1,4 @@
-import type { Input } from "../../optimizer/types";
+import type { Input } from "../../../optimizer/types";
 
 export const sampleInput: Input = {
   origin: {

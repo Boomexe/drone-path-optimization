@@ -1,6 +1,6 @@
 import { isValidEdge } from "./collisionUtils";
 import { dist3D } from "./coordUtils";
-import type { GraphEdge, GraphNode, NormalizedInput, ObstacleXY } from "./types";
+import type { GraphEdge, GraphNode, ObstacleXY } from "./types";
 
 const MAX_EDGE_COST = 200; // Arbitrary threshold to skip very long edges
 
