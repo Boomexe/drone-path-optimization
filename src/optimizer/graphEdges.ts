@@ -2,7 +2,7 @@ import { isValidEdge } from "./collisionUtils";
 import { dist3D } from "./coordUtils";
 import type { GraphEdge, GraphNode, NormalizedInput, ObstacleXY } from "./types";
 
-// const MAX_EDGE_COST = 200; // Arbitrary threshold to skip very long edges
+const MAX_EDGE_COST = 200; // Arbitrary threshold to skip very long edges
 
 export function buildGraphEdges(
   nodes: GraphNode[],
@@ -29,10 +29,10 @@ export function buildGraphEdges(
       const cost = dist3D(from.pos, to.pos);
 
       // Prune edges with high distances
-      // if (cost > MAX_EDGE_COST && !isImportantEdge(from, to)) {
-      //   skippedByDistance++;
-      //   continue;
-      // }
+      if (cost > MAX_EDGE_COST && !isImportantEdge(from, to)) {
+        skippedByDistance++;
+        continue;
+      }
 
       collisionChecks++;
 

@@ -16,7 +16,7 @@ import type {
 
 const startTime = performance.now()
 
-const normalizedInput = getNormalizedInput(sampleInput);
+const normalizedInput = getNormalizedInput(largeInput);
 console.time("nodes");
 const nodes = generateNodeMap(normalizedInput);
 console.timeEnd("nodes");
