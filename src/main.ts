@@ -15,6 +15,7 @@ document.querySelector("#app")!.innerHTML = `
     <label for="test-case-select">Test case:</label>
     <select id="test-case-select"></select>
     <button id="run-button">Run Planner</button>
+    <button id="download-output-button" disabled>Download Output JSON</button>
     <span id="status" style="margin-left: 12px;">Ready</span>
   </div>
 
@@ -30,6 +31,17 @@ const select = document.querySelector<HTMLSelectElement>("#test-case-select")!;
 const runButton = document.querySelector<HTMLButtonElement>("#run-button")!;
 const selectedPathDiv =
   document.querySelector<HTMLDivElement>("#selected-path")!;
+const downloadOutputButton = document.querySelector<HTMLButtonElement>(
+  "#download-output-button",
+)!;
+
+let latestOutput: unknown = null;
+
+downloadOutputButton.addEventListener("click", () => {
+  if (!latestOutput) return;
+
+  downloadJsonFile(latestOutput, "drone-path-output.json");
+});
 
 for (const testCase of testCases) {
   const option = document.createElement("option");
@@ -42,6 +54,7 @@ let currentWorker: Worker | null = null;
 
 runButton.addEventListener("click", () => {
   runSelectedTestCase();
+  downloadOutputButton.disabled = true;
 });
 
 function runSelectedTestCase(): void {
@@ -106,17 +119,28 @@ function runSelectedTestCase(): void {
 
     console.timeEnd("render");
 
+    const outputData = {
+      success: result.success,
+      message: result.message,
+      testCase: selectedCase.name,
+      stats: result.stats,
+      selectedPath: result.selectedPath?.map((node: GraphNode) => ({
+        id: node.id,
+        x: node.pos.x,
+        y: node.pos.y,
+        z: node.pos.z,
+      })),
+      path: result.path,
+    };
+
     output.textContent = JSON.stringify(
-      {
-        success: result.success,
-        message: result.message,
-        testCase: selectedCase.name,
-        stats: result.stats,
-        selctedPath: result.selectedPath,
-      },
+      outputData,
       null,
       2,
     );
+    latestOutput = outputData;
+    downloadOutputButton.disabled = false;
+
     selectedPathDiv.textContent = "";
 
     const selectedPathLabel = document.createElement("h2");
@@ -294,32 +318,32 @@ function drawObstacles(
   }
 }
 
-function drawEdges(
-  ctx: CanvasRenderingContext2D,
-  edges: GraphEdge[],
-  nodes: GraphNode[],
-  toCanvas: (point: Pos2) => Pos2,
-): void {
-  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+// function drawEdges(
+//   ctx: CanvasRenderingContext2D,
+//   edges: GraphEdge[],
+//   nodes: GraphNode[],
+//   toCanvas: (point: Pos2) => Pos2,
+// ): void {
+//   const nodeById = new Map(nodes.map((node) => [node.id, node]));
 
-  ctx.strokeStyle = "rgba(0, 0, 0, 0.10)";
-  ctx.lineWidth = 1;
+//   ctx.strokeStyle = "rgba(0, 0, 0, 0.10)";
+//   ctx.lineWidth = 1;
 
-  for (const edge of edges) {
-    const from = nodeById.get(edge.from);
-    const to = nodeById.get(edge.to);
+//   for (const edge of edges) {
+//     const from = nodeById.get(edge.from);
+//     const to = nodeById.get(edge.to);
 
-    if (!from || !to) continue;
+//     if (!from || !to) continue;
 
-    const a = toCanvas(from.pos);
-    const b = toCanvas(to.pos);
+//     const a = toCanvas(from.pos);
+//     const b = toCanvas(to.pos);
 
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-  }
-}
+//     ctx.beginPath();
+//     ctx.moveTo(a.x, a.y);
+//     ctx.lineTo(b.x, b.y);
+//     ctx.stroke();
+//   }
+// }
 
 function drawNodes(
   ctx: CanvasRenderingContext2D,
@@ -402,4 +426,24 @@ function averagePoint(points: Pos2[]): Pos2 {
     x: x / points.length,
     y: y / points.length,
   };
+}
+
+function downloadJsonFile(data: unknown, filename: string): void {
+  const json = JSON.stringify(data, null, 2);
+
+  const blob = new Blob([json], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
 }

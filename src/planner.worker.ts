@@ -7,7 +7,6 @@ import type {
   GraphNode,
   Input,
   NormalizedInput,
-  ObstacleXY,
   Pos3,
 } from "./optimizer/types";
 
@@ -50,7 +49,7 @@ type WorkerFailureResponse = {
   };
 };
 
-type WorkerResponse = WorkerSuccessResponse | WorkerFailureResponse;
+// type WorkerResponse = WorkerSuccessResponse | WorkerFailureResponse;
 
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const totalStart = performance.now();
