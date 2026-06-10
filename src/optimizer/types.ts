@@ -16,10 +16,13 @@ export type Pos3 = Pos2 & {
   z: number;
 };
 
+export type GraphNodeKind = "start" | "end" | "start-altitude" | "end-altitude" | "obstacle";
+
 // "Node" is taken lol
 export type GraphNode = {
   id: number;
   pos: Pos3;
+  kind: GraphNodeKind;
 };
 
 export type GraphEdge = {

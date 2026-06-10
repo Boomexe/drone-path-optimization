@@ -1,3 +1,5 @@
+import { largeInput } from "./data/test-cases/largeTest";
+import { sampleNormalizedInput } from "./data/test-cases/normalizedtest1";
 import { sampleInput } from "./data/test-cases/test1";
 import { astar } from "./optimizer/astar";
 import { generateNodeMap } from "./optimizer/generateNodeMap";
@@ -11,11 +13,27 @@ import type {
   Pos3,
 } from "./optimizer/types";
 
-const normalizedInput = getNormalizedInput(sampleInput);
-const nodes = generateNodeMap(normalizedInput);
-const edges = buildGraphEdges(nodes, normalizedInput.obstacles);
+const startTime = performance.now()
 
-const pathNodes = astar(nodes, edges, 0, 1);
+const normalizedInput = getNormalizedInput(largeInput);
+console.time("nodes");
+const nodes = generateNodeMap(normalizedInput);
+console.timeEnd("nodes");
+
+console.time("edges");
+const edges = buildGraphEdges(nodes, normalizedInput.obstacles);
+console.timeEnd("edges");
+
+const startId = nodes[0].id;
+const endId = nodes[1].id;
+
+console.time("astar");
+const pathNodes = astar(nodes, edges, startId, endId);
+console.timeEnd("astar");
+
+// throw new Error("Debug stop");
+
+const endTime = performance.now()
 
 document.querySelector("#app")!.innerHTML = `
   <h1>Path Debug View</h1>
@@ -31,6 +49,7 @@ if (!pathNodes) {
     {
       success: false,
       message: "No path found",
+      timeMs: endTime - startTime,
       nodeCount: nodes.length,
       edgeCount: edges.length,
     },
@@ -38,25 +57,30 @@ if (!pathNodes) {
     2,
   );
 
+  console.time("render");
   renderDebugCanvas(canvas, {
     obstacles: normalizedInput.obstacles,
     nodes,
     edges,
     path: [],
   });
+  console.timeEnd("render");
 } else {
   const pathIds = pathNodes.map((node) => node.id);
 
+  console.time("render");
   renderDebugCanvas(canvas, {
     obstacles: normalizedInput.obstacles,
     nodes,
     edges,
     path: pathNodes.map((node) => node.pos),
   });
+  console.timeEnd("render");
 
   output.textContent = JSON.stringify(
     {
       success: true,
+      timeMs: endTime - startTime,
       nodeCount: nodes.length,
       edgeCount: edges.length,
       pathIds,
@@ -89,7 +113,7 @@ function renderDebugCanvas(canvas: HTMLCanvasElement, data: RenderData): void {
   const toCanvas = createCanvasTransform(canvas, data);
 
   drawObstacles(ctx, data.obstacles, toCanvas);
-  drawEdges(ctx, data.edges, data.nodes, toCanvas);
+  // drawEdges(ctx, data.edges, data.nodes, toCanvas);
   drawNodes(ctx, data.nodes, toCanvas);
   drawPath(ctx, data.path, toCanvas);
 }

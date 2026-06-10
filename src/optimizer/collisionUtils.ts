@@ -2,6 +2,52 @@ import type { GraphNode, ObstacleXY, Pos2, Pos3 } from "./types";
 
 const EPSILON = 1e-9;
 
+type Box2 = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
+
+function getSegmentBox(a: Pos2, b: Pos2): Box2 {
+  return {
+    minX: Math.min(a.x, b.x),
+    maxX: Math.max(a.x, b.x),
+    minY: Math.min(a.y, b.y),
+    maxY: Math.max(a.y, b.y),
+  };
+}
+
+function getPolygonBox(points: Pos2[]): Box2 {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const point of points) {
+    minX = Math.min(minX, point.x);
+    maxX = Math.max(maxX, point.x);
+    minY = Math.min(minY, point.y);
+    maxY = Math.max(maxY, point.y);
+  }
+
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY,
+  };
+}
+
+function boxesOverlap(a: Box2, b: Box2): boolean {
+  return (
+    a.minX <= b.maxX &&
+    a.maxX >= b.minX &&
+    a.minY <= b.maxY &&
+    a.maxY >= b.minY
+  );
+}
+
 function isPointInPolygon2D(point: Pos2, polygonPoints: Pos2[]): boolean {
   let isInside = false;
 
@@ -93,7 +139,16 @@ export function isValidEdge(
   to: GraphNode,
   obstacles: ObstacleXY[],
 ): boolean {
+  const edgeBox = getSegmentBox(from.pos, to.pos);
+
   for (const obstacle of obstacles) {
+    const obstacleBox = getPolygonBox(obstacle.points);
+
+    // Skips lots of slow edge collision checks
+    if (!boxesOverlap(edgeBox, obstacleBox)) {
+      continue;
+    }
+
     const crossesPolygon2D = doesSegmentIntersectPolygon2D(
       from.pos,
       to.pos,
