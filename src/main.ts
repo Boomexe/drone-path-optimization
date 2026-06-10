@@ -8,7 +8,8 @@ import type {
 } from "./optimizer/types";
 
 document.querySelector("#app")!.innerHTML = `
-  <h1>Path Debug View</h1>
+  <h1>Drone Path Optimizer</h1>
+  <p>no css because budget cuts</p>
 
   <div style="margin-bottom: 12px;">
     <label for="test-case-select">Test case:</label>
@@ -18,6 +19,7 @@ document.querySelector("#app")!.innerHTML = `
   </div>
 
   <canvas id="debug-canvas" width="900" height="650"></canvas>
+  <div id="selected-path"></div>
   <pre id="debug-output"></pre>
 `;
 
@@ -26,6 +28,8 @@ const output = document.querySelector<HTMLPreElement>("#debug-output")!;
 const statusText = document.querySelector<HTMLSpanElement>("#status")!;
 const select = document.querySelector<HTMLSelectElement>("#test-case-select")!;
 const runButton = document.querySelector<HTMLButtonElement>("#run-button")!;
+const selectedPathDiv =
+  document.querySelector<HTMLDivElement>("#selected-path")!;
 
 for (const testCase of testCases) {
   const option = document.createElement("option");
@@ -46,6 +50,7 @@ function runSelectedTestCase(): void {
 
   if (!selectedCase) {
     output.textContent = `Could not find test case: ${selectedId}`;
+    selectedPathDiv.textContent = "";
     return;
   }
 
@@ -58,6 +63,7 @@ function runSelectedTestCase(): void {
   runButton.disabled = true;
   select.disabled = true;
 
+  selectedPathDiv.textContent = "";
   output.textContent = JSON.stringify(
     {
       message: "Computing path...",
@@ -85,6 +91,7 @@ function runSelectedTestCase(): void {
 
     if (!result.normalizedInput) {
       output.textContent = JSON.stringify(result, null, 2);
+      selectedPathDiv.textContent = "";
       return;
     }
 
@@ -105,10 +112,65 @@ function runSelectedTestCase(): void {
         message: result.message,
         testCase: selectedCase.name,
         stats: result.stats,
+        selctedPath: result.selectedPath,
       },
       null,
       2,
     );
+    selectedPathDiv.textContent = "";
+
+    const selectedPathLabel = document.createElement("h2");
+    selectedPathLabel.textContent = "Selected Path";
+    selectedPathDiv.appendChild(selectedPathLabel);
+
+    const table = document.createElement("table");
+    table.style.borderCollapse = "collapse";
+    table.style.marginTop = "8px";
+    table.style.width = "100%";
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    const headers = ["Step", "Node ID", "X", "Y", "Z"];
+
+    for (const header of headers) {
+      const th = document.createElement("th");
+      th.textContent = header;
+      th.style.border = "1px solid black";
+      th.style.padding = "4px 8px";
+      th.style.textAlign = "left";
+      headerRow.appendChild(th);
+    }
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    result.selectedPath.forEach((node: GraphNode, index: number) => {
+      const row = document.createElement("tr");
+
+      const values = [
+        index.toString(),
+        node.id.toString(),
+        node.pos.x.toFixed(2),
+        node.pos.y.toFixed(2),
+        node.pos.z.toFixed(2),
+      ];
+
+      for (const value of values) {
+        const td = document.createElement("td");
+        td.textContent = value;
+        td.style.border = "1px solid black";
+        td.style.padding = "4px 8px";
+        row.appendChild(td);
+      }
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    selectedPathDiv.appendChild(table);
   };
 
   worker.onerror = (error) => {
@@ -118,7 +180,7 @@ function runSelectedTestCase(): void {
     runButton.disabled = false;
     select.disabled = false;
     statusText.textContent = "Worker error";
-
+    selectedPathDiv.textContent = "";
     output.textContent = JSON.stringify(
       {
         success: false,
@@ -319,7 +381,11 @@ function drawPath(
 
     ctx.fillStyle = "black";
     ctx.font = "11px sans-serif";
-    ctx.fillText(`${point.z.toFixed(0)}m`, canvasPoint.x + 6, canvasPoint.y - 6);
+    ctx.fillText(
+      `${point.z.toFixed(0)}m`,
+      canvasPoint.x + 6,
+      canvasPoint.y - 6,
+    );
   }
 }
 
