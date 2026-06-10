@@ -39,8 +39,6 @@ type ConvertOptions = {
   metersPerLevel?: number;
   maxObstacles?: number;
 
-  // Removes consecutive polygon vertices closer than this distance.
-  // Try 2, 3, 5, or 8 depending on how much simplification you want.
   minVertexDistanceMeters?: number;
 };
 

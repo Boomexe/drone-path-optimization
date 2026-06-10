@@ -1,12 +1,4 @@
-import { newYorkInput } from "./data/test-cases/newYork";
-import { largeInput } from "./data/test-cases/old/largeTest";
-import { octagonTest } from "./data/test-cases/old/octagonTest";
-import { parisInput } from "./data/test-cases/paris";
-import { sanFranciscoInput } from "./data/test-cases/sanFrancisco";
-import { astar } from "./optimizer/astar";
-import { generateNodeMap } from "./optimizer/generateNodeMap";
-import { buildGraphEdges } from "./optimizer/graphEdges";
-import { getNormalizedInput } from "./optimizer/inputHandling";
+import { testCases } from "./data/test-cases";
 import type {
   GraphEdge,
   GraphNode,
@@ -15,92 +7,138 @@ import type {
   Pos3,
 } from "./optimizer/types";
 
-const startTime = performance.now()
-
-const normalizedInput = getNormalizedInput(parisInput);
-console.time("nodes");
-const nodes = generateNodeMap(normalizedInput);
-console.timeEnd("nodes");
-
-// const duplicateCount = countDuplicateNodes(nodes);
-// console.log(`duplicate: ${duplicateCount.duplicateNodes}, unique: ${duplicateCount.uniqueNodes}, total: ${duplicateCount.totalNodes} nodes`);
-
-console.time("edges");
-const edges = buildGraphEdges(nodes, normalizedInput.obstacles);
-console.timeEnd("edges");
-
-const startId = nodes[0].id;
-const endId = nodes[1].id;
-
-console.time("astar");
-const pathNodes = astar(nodes, edges, startId, endId);
-console.timeEnd("astar");
-
-// throw new Error("Debug stop");
-
-const endTime = performance.now()
-
 document.querySelector("#app")!.innerHTML = `
   <h1>Path Debug View</h1>
+
+  <div style="margin-bottom: 12px;">
+    <label for="test-case-select">Test case:</label>
+    <select id="test-case-select"></select>
+    <button id="run-button">Run Planner</button>
+    <span id="status" style="margin-left: 12px;">Ready</span>
+  </div>
+
   <canvas id="debug-canvas" width="900" height="650"></canvas>
   <pre id="debug-output"></pre>
 `;
 
 const canvas = document.querySelector<HTMLCanvasElement>("#debug-canvas")!;
 const output = document.querySelector<HTMLPreElement>("#debug-output")!;
+const statusText = document.querySelector<HTMLSpanElement>("#status")!;
+const select = document.querySelector<HTMLSelectElement>("#test-case-select")!;
+const runButton = document.querySelector<HTMLButtonElement>("#run-button")!;
 
-if (!pathNodes) {
-  output.textContent = JSON.stringify(
-    {
-      success: false,
-      message: "No path found",
-      timeMs: endTime - startTime,
-      nodeCount: nodes.length,
-      edgeCount: edges.length,
-    },
-    null,
-    2,
-  );
-
-  console.time("render");
-  renderDebugCanvas(canvas, {
-    obstacles: normalizedInput.obstacles,
-    nodes,
-    edges,
-    path: [],
-  });
-  console.timeEnd("render");
-} else {
-  const pathIds = pathNodes.map((node) => node.id);
-
-  console.time("render");
-  renderDebugCanvas(canvas, {
-    obstacles: normalizedInput.obstacles,
-    nodes,
-    edges,
-    path: pathNodes.map((node) => node.pos),
-  });
-  console.timeEnd("render");
-
-  output.textContent = JSON.stringify(
-    {
-      success: true,
-      timeMs: endTime - startTime,
-      nodeCount: nodes.length,
-      edgeCount: edges.length,
-      pathIds,
-      pathLength: pathNodes.length,
-      path: pathNodes.map((node) => ({
-        id: node.id,
-        x: node.pos.x,
-        y: node.pos.y,
-        z: node.pos.z,
-      })),
-    },
-    null,
-    2,
-  );
+for (const testCase of testCases) {
+  const option = document.createElement("option");
+  option.value = testCase.id;
+  option.textContent = testCase.name;
+  select.appendChild(option);
 }
+
+let currentWorker: Worker | null = null;
+
+runButton.addEventListener("click", () => {
+  runSelectedTestCase();
+});
+
+function runSelectedTestCase(): void {
+  const selectedId = select.value;
+  const selectedCase = testCases.find((testCase) => testCase.id === selectedId);
+
+  if (!selectedCase) {
+    output.textContent = `Could not find test case: ${selectedId}`;
+    return;
+  }
+
+  if (currentWorker) {
+    currentWorker.terminate();
+    currentWorker = null;
+  }
+
+  statusText.textContent = "Computing...";
+  runButton.disabled = true;
+  select.disabled = true;
+
+  output.textContent = JSON.stringify(
+    {
+      message: "Computing path...",
+      testCase: selectedCase.name,
+    },
+    null,
+    2,
+  );
+
+  const worker = new Worker(new URL("./planner.worker.ts", import.meta.url), {
+    type: "module",
+  });
+
+  currentWorker = worker;
+
+  worker.onmessage = (event) => {
+    const result = event.data;
+
+    currentWorker = null;
+    worker.terminate();
+
+    runButton.disabled = false;
+    select.disabled = false;
+    statusText.textContent = result.success ? "Done" : "Failed";
+
+    if (!result.normalizedInput) {
+      output.textContent = JSON.stringify(result, null, 2);
+      return;
+    }
+
+    console.time("render");
+
+    renderDebugCanvas(canvas, {
+      obstacles: result.normalizedInput.obstacles,
+      nodes: result.nodes ?? [],
+      edges: result.edges ?? [],
+      path: result.path ?? [],
+    });
+
+    console.timeEnd("render");
+
+    output.textContent = JSON.stringify(
+      {
+        success: result.success,
+        message: result.message,
+        testCase: selectedCase.name,
+        stats: result.stats,
+      },
+      null,
+      2,
+    );
+  };
+
+  worker.onerror = (error) => {
+    currentWorker = null;
+    worker.terminate();
+
+    runButton.disabled = false;
+    select.disabled = false;
+    statusText.textContent = "Worker error";
+
+    output.textContent = JSON.stringify(
+      {
+        success: false,
+        message: error.message,
+        filename: error.filename,
+        lineno: error.lineno,
+        colno: error.colno,
+      },
+      null,
+      2,
+    );
+  };
+
+  worker.postMessage({
+    input: selectedCase.input,
+  });
+}
+
+// Optional: automatically run the first test case on page load.
+// runSelectedTestCase();
 
 type RenderData = {
   obstacles: ObstacleXY[];

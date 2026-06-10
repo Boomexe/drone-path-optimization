@@ -1,4 +1,4 @@
-import type { NormalizedInput, ObstacleXY } from "../../../optimizer/types";
+import type { NormalizedInput, ObstacleXY } from "../../optimizer/types";
 
 function makeRectangleObstacle(
   id: string,
@@ -24,9 +24,8 @@ function makeRectangleObstacle(
 const obstacles: ObstacleXY[] = [];
 
 const columns = 20;
-const rows = 20;
+const rows = 12;
 
-// Creates exactly 20 * 10 = 200 obstacles.
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < columns; col++) {
     const idNumber = row * columns + col + 1;
@@ -37,10 +36,11 @@ for (let row = 0; row < rows; row++) {
     const width = 18 + ((row + col) % 3) * 4;
     const height2D = 22 + ((row * 2 + col) % 3) * 5;
 
-    // Varied obstacle heights, all below ceiling.
-    // Some can be flown over, some are taller and encourage going around.
-    // const obstacleHeight = 15 + ((row * 7 + col * 11) % 55);
-    const obstacleHeight = 1000;
+    const isTooTall = (row + col) % 2 === 0;
+
+    const obstacleHeight = isTooTall
+      ? 120 + ((row * 7 + col * 11) % 80) // 120–199, above ceiling
+      : 25 + ((row * 7 + col * 11) % 65); // 25–89, below ceiling
 
     obstacles.push(
       makeRectangleObstacle(

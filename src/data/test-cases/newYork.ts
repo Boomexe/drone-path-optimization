@@ -29,5 +29,5 @@ export const newYorkInput = geoJsonBuildingsToInput(geoJson, {
   metersPerLevel: 3,
   maxObstacles: 200,
 
-  minVertexDistanceMeters: 3,
+  minVertexDistanceMeters: 5,
 });
