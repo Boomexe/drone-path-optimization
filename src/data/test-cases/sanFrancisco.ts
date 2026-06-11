@@ -25,9 +25,9 @@ export const sanFranciscoInput = geoJsonBuildingsToInput(geoJson, {
   floor: 0,
   ceiling: 120,
 
-  defaultHeight: 12,
+  defaultHeight: 30,
   metersPerLevel: 3,
-  maxObstacles: 200,
+  maxObstacles: 360,
 
   minVertexDistanceMeters: 3,
 });

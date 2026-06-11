@@ -28,6 +28,7 @@ type WorkerSuccessResponse = {
     nodeCount: number;
     edgeCount: number;
     pathLength: number;
+    obstacleCount: number;
   };
   // selectedPath: GraphNode[];
 };
@@ -46,6 +47,7 @@ type WorkerFailureResponse = {
     astarMs: number;
     nodeCount: number;
     edgeCount: number;
+    obstacleCount: number | null;
   };
 };
 
@@ -78,6 +80,8 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
 
     const totalEnd = performance.now();
 
+    const obstacleCount = normalizedInput.obstacles.length;
+
     if (!pathNodes) {
       const response: WorkerFailureResponse = {
         success: false,
@@ -91,6 +95,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
           nodesMs: nodesEnd - nodesStart,
           edgesMs: edgesEnd - edgesStart,
           astarMs: astarEnd - astarStart,
+          obstacleCount: obstacleCount,
           nodeCount: nodes.length,
           edgeCount: edges.length,
         },
@@ -114,6 +119,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
         nodeCount: nodes.length,
         edgeCount: edges.length,
         pathLength: pathNodes.length,
+        obstacleCount: obstacleCount,
       },
       // selectedPath: pathNodes,
     };
@@ -136,6 +142,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
         astarMs: 0,
         nodeCount: nodes.length,
         edgeCount: edges.length,
+        obstacleCount: null,
       },
     };
 

@@ -66,11 +66,6 @@ export const testCases: TestCase[] = [
     input: sketchLayoutTest,
   },
   {
-    id: "large",
-    name: "Large Generated Test",
-    input: largeInput,
-  },
-  {
     id: "random-boxes",
     name: "Random Boxes",
     input: randomBoxes,
@@ -79,6 +74,11 @@ export const testCases: TestCase[] = [
     id: "random-boxes-low-ceiling",
     name: "Random Boxes Low Ceiling",
     input: randomBoxesLowCeiling,
+  },
+  {
+    id: "large",
+    name: "Large Generated Test",
+    input: largeInput,
   },
   {
     id: "mixed-obstacles",

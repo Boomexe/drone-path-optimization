@@ -81,24 +81,3 @@ export function buildGraphEdges(
 
   return edges;
 }
-
-// function shouldTryEdge(from: GraphNode, to: GraphNode, input: NormalizedInput): boolean {
-
-// }
-
-function isImportantEdge(from: GraphNode, to: GraphNode): boolean {
-  return (
-    isStartFamily(from) ||
-    isStartFamily(to) ||
-    isEndFamily(from) ||
-    isEndFamily(to)
-  );
-}
-
-function isStartFamily(node: GraphNode): boolean {
-  return node.kind === "start" || node.kind === "start-altitude";
-}
-
-function isEndFamily(node: GraphNode): boolean {
-  return node.kind === "end" || node.kind === "end-altitude";
-}

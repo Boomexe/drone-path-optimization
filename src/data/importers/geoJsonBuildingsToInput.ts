@@ -66,8 +66,8 @@ export function geoJsonBuildingsToInput(
 
     for (const polygon of polygons) {
       if (
-        options.maxObstacles !== undefined &&
-        obstacles.length >= options.maxObstacles
+        options.maxObstacles !== undefined
+         && obstacles.length >= options.maxObstacles
       ) {
         break;
       }
