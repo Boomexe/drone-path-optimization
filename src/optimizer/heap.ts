@@ -14,11 +14,19 @@ export class Heap<T extends HeapItem<T>> {
   }
 
   removeFirst(): T {
+    if (this.currentItemCount === 0) {
+      throw new Error("Cannot remove from an empty heap.");
+    }
+
     const firstItem: T = this.items[0];
     this.currentItemCount--;
-    this.items[0] = this.items[this.currentItemCount];
-    this.items[0].heapIndex = 0;
-    this.sortDown(this.items[0]);
+
+    if (this.currentItemCount > 0) {
+      this.items[0] = this.items[this.currentItemCount];
+      this.items[0].heapIndex = 0;
+      this.sortDown(this.items[0]);
+    }
+    
     return firstItem;
   }
 

@@ -11,8 +11,7 @@ export type Box2 = {
 
 export type BoundedObstacleXY = ObstacleXY & {
   bounds: Box2;
-}
-
+};
 
 function getSegmentBox(a: Pos2, b: Pos2): Box2 {
   return {
@@ -46,10 +45,7 @@ function getPolygonBox(points: Pos2[]): Box2 {
 
 function boxesOverlap(a: Box2, b: Box2): boolean {
   return (
-    a.minX <= b.maxX &&
-    a.maxX >= b.minX &&
-    a.minY <= b.maxY &&
-    a.maxY >= b.minY
+    a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY
   );
 }
 
@@ -139,9 +135,12 @@ export function isValidEdge(
   boundedObstacles: BoundedObstacleXY[],
 ): boolean {
   const edgeBox = getSegmentBox(from.pos, to.pos);
+  const lowestEdgeHeight = Math.min(from.pos.z, to.pos.z);
 
   for (const obstacle of boundedObstacles) {
-    // const obstacleBox = getPolygonBox(obstacle.points);
+    if (lowestEdgeHeight > obstacle.height) {
+      continue;
+    }
 
     // Skips lots of slow edge collision checks
     if (!boxesOverlap(edgeBox, obstacle.bounds)) {
@@ -154,13 +153,7 @@ export function isValidEdge(
       obstacle.points,
     );
 
-    if (!crossesPolygon2D) {
-      continue;
-    }
-
-    const lowestEdgeHeight = Math.min(from.pos.z, to.pos.z);
-
-    if (lowestEdgeHeight <= obstacle.height) {
+    if (crossesPolygon2D) {
       return false;
     }
   }
@@ -168,7 +161,9 @@ export function isValidEdge(
   return true;
 }
 
-export function generateObstacleBounds(obstacles: ObstacleXY[]): BoundedObstacleXY[] {
+export function generateObstacleBounds(
+  obstacles: ObstacleXY[],
+): BoundedObstacleXY[] {
   return obstacles.map((obstacle) => ({
     ...obstacle,
     bounds: getPolygonBox(obstacle.points),

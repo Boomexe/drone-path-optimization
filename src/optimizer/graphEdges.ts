@@ -13,7 +13,7 @@ export function buildGraphEdges(
 
   let totalPairs = 0;
   let skippedByDistance = 0;
-  let collisionChecks = 0;
+  let edgeValidityChecks = 0;
   let validPairs = 0;
 
   for (let i = 0; i < nodes.length; i++) {
@@ -35,7 +35,7 @@ export function buildGraphEdges(
         continue;
       }
 
-      collisionChecks++;
+      edgeValidityChecks++;
 
       if (!isValidEdge(from, to, boundedObstacles)) {
         continue;
@@ -61,7 +61,7 @@ export function buildGraphEdges(
   console.log({
     totalPairs,
     skippedByDistance,
-    collisionChecks,
+    collisionChecks: edgeValidityChecks,
     validPairs,
     directedEdges: edges.length,
   });
