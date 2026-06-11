@@ -1,15 +1,24 @@
 import { generateObstacleBounds, isValidEdge } from "./collisionUtils";
-import { dist3D } from "./coordUtils";
+import { dist3DSquared } from "./coordUtils";
 import type { GraphEdge, GraphNode, ObstacleXY } from "./types";
 
 const MAX_EDGE_COST = 200; // Arbitrary threshold to skip very long edges
+const MAX_EDGE_COST_SQUARED = MAX_EDGE_COST * MAX_EDGE_COST;
 
 export function buildGraphEdges(
   nodes: GraphNode[],
-  obstacles: ObstacleXY[]
+  obstacles: ObstacleXY[],
 ): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const boundedObstacles = generateObstacleBounds(obstacles);
+
+  const isImportantNode = nodes.map(
+    (node) =>
+      node.kind === "start" ||
+      node.kind === "start-altitude" ||
+      node.kind === "end" ||
+      node.kind === "end-altitude",
+  );
 
   let totalPairs = 0;
   let skippedByDistance = 0;
@@ -27,13 +36,17 @@ export function buildGraphEdges(
 
       totalPairs++;
 
-      const cost = dist3D(from.pos, to.pos);
+      const distSquared = dist3DSquared(from.pos, to.pos);
+
+      const isImportantPair = isImportantNode[i] || isImportantNode[j];
 
       // Prune unimportant edges with high distances
-      if (cost > MAX_EDGE_COST && !isImportantEdge(from, to)) {
+      if (distSquared > MAX_EDGE_COST_SQUARED && !isImportantPair) {
         skippedByDistance++;
         continue;
       }
+
+      const cost = Math.sqrt(distSquared);
 
       edgeValidityChecks++;
 
@@ -70,7 +83,7 @@ export function buildGraphEdges(
 }
 
 // function shouldTryEdge(from: GraphNode, to: GraphNode, input: NormalizedInput): boolean {
-  
+
 // }
 
 function isImportantEdge(from: GraphNode, to: GraphNode): boolean {

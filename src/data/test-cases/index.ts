@@ -15,6 +15,7 @@ import { mixedObstacleTest } from "./mixedObstacleTest";
 import { randomBoxes } from "./randomBoxes";
 import { randomBoxesLowCeiling } from "./randomBoxesLowCeiling";
 import { mazeTest } from "./mazeTest";
+import { notAnObstacle } from "./notAnObstacle";
 
 export type TestCase = {
   id: string;
@@ -32,6 +33,11 @@ export const testCases: TestCase[] = [
     id: "simple-cube",
     name: "Simple Cube",
     input: simpleCube,
+  },
+  {
+    id: "not-an-obstacle",
+    name: "Not An Obstacle",
+    input: notAnObstacle,
   },
   { id: "simple-elevated", name: "Simple Elevated", input: simpleElevated },
   {
