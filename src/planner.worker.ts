@@ -19,6 +19,7 @@ type WorkerSuccessResponse = {
   normalizedInput: NormalizedInput;
   nodes: GraphNode[];
   edges: GraphEdge[];
+  pathDistance: number;
   path: Pos3[];
   stats: {
     totalMs: number;
@@ -75,7 +76,10 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
     const endId = nodes[1].id;
 
     const astarStart = performance.now();
-    const pathNodes = astar(nodes, edges, startId, endId);
+    const aStarResult = astar(nodes, edges, startId, endId);
+    const pathNodes = aStarResult ? aStarResult.path : null;
+    const pathDistance = aStarResult ? aStarResult.distance : -1;
+
     const astarEnd = performance.now();
 
     const totalEnd = performance.now();
@@ -110,6 +114,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
       normalizedInput,
       nodes,
       edges,
+      pathDistance,
       path: pathNodes.map((node) => node.pos),
       stats: {
         totalMs: totalEnd - totalStart,

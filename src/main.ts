@@ -130,6 +130,7 @@ function runSelectedTestCase(): void {
         y: node.pos.y,
         z: node.pos.z,
       })),
+      pathDistance: result.pathDistance,
       path: result.path,
     };
 

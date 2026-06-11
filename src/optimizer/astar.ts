@@ -3,12 +3,17 @@ import { dist3D } from "./coordUtils";
 import { Heap } from "./heap";
 import type { GraphEdge, GraphNode } from "./types";
 
+export type AStarResult = {
+  path: GraphNode[];
+  distance: number;
+};
+
 export function astar(
   nodes: GraphNode[],
   edges: GraphEdge[],
   startId: number,
   endId: number,
-): GraphNode[] | null {
+): AStarResult | null {
   const adjacency = new Map<number, GraphEdge[]>();
 
   for (const edge of edges) {
@@ -37,7 +42,10 @@ export function astar(
     let current = openSet.removeFirst();
 
     if (current.id == end.id) {
-      return retracePath(start, end);
+      return {
+        path: retracePath(start, end),
+        distance: end.gCost,
+      };
     }
 
     closedSet.add(current.id);
@@ -70,10 +78,7 @@ export function astar(
   return null;
 }
 
-function retracePath(
-  startNode: AStarNode,
-  endNode: AStarNode
-): GraphNode[] {
+function retracePath(startNode: AStarNode, endNode: AStarNode): GraphNode[] {
   const path: GraphNode[] = [];
 
   let current: AStarNode | null = endNode;
@@ -85,6 +90,6 @@ function retracePath(
 
   path.push(startNode.graphNode);
   path.reverse();
-	
+
   return path;
 }
