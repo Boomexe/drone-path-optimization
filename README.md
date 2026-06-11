@@ -53,3 +53,4 @@ Possible future optimizations:
 - [Sebastian Lague A* pathfinding in Unity tutorial](https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW)
 - [Overpass Turbo](https://overpass-turbo.eu) (for getting building GeoJson)
 - [Simple A* Explaination](https://www.youtube.com/watch?v=qigPctCgR_k)
+- [Theta* Comparison](https://news.movel.ai/theta-star?x-host=news.movel.ai)
