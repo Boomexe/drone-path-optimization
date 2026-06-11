@@ -29,7 +29,7 @@ type WorkerSuccessResponse = {
     edgeCount: number;
     pathLength: number;
   };
-  selectedPath: GraphNode[];
+  // selectedPath: GraphNode[];
 };
 
 type WorkerFailureResponse = {
@@ -115,7 +115,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
         edgeCount: edges.length,
         pathLength: pathNodes.length,
       },
-      selectedPath: pathNodes,
+      // selectedPath: pathNodes,
     };
 
     self.postMessage(response);

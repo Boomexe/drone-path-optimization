@@ -29,7 +29,7 @@ export function buildGraphEdges(
 
       const cost = dist3D(from.pos, to.pos);
 
-      // Prune edges with high distances
+      // Prune unimportant edges with high distances
       if (cost > MAX_EDGE_COST && !isImportantEdge(from, to)) {
         skippedByDistance++;
         continue;

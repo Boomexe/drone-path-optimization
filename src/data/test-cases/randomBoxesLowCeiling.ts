@@ -1,6 +1,6 @@
-import type { Input } from "../../../optimizer/types";
+import type { Input } from "../../optimizer/types";
 
-export const sampleInput: Input = {
+export const randomBoxesLowCeiling: Input = {
   origin: {
     lat: 37.333,
     lon: -121.891,
@@ -12,7 +12,7 @@ export const sampleInput: Input = {
     height: 0,
   },
   floor: 0,
-  ceiling: 80,
+  ceiling: 10,
   obstacles: [
     {
       id: "A01",

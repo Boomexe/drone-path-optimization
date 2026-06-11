@@ -12,6 +12,9 @@ import { simpleCircle } from "./simpleCircle";
 import { sketchLayoutTest } from "./sketchLayoutTest";
 import { irregularPolygon } from "./irregularPolygon";
 import { mixedObstacleTest } from "./mixedObstacleTest";
+import { randomBoxes } from "./randomBoxes";
+import { randomBoxesLowCeiling } from "./randomBoxesLowCeiling";
+import { mazeTest } from "./mazeTest";
 
 export type TestCase = {
   id: string;
@@ -62,9 +65,24 @@ export const testCases: TestCase[] = [
     input: largeInput,
   },
   {
+    id: "random-boxes",
+    name: "Random Boxes",
+    input: randomBoxes,
+  },
+  {
+    id: "random-boxes-low-ceiling",
+    name: "Random Boxes Low Ceiling",
+    input: randomBoxesLowCeiling,
+  },
+  {
     id: "mixed-obstacles",
     name: "Mixed Obstacles",
     input: mixedObstacleTest,
+  },
+  {
+    id: "maze",
+    name: "Maze",
+    input: mazeTest,
   },
   {
     id: "new-york",
