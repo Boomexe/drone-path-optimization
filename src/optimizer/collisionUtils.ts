@@ -2,12 +2,17 @@ import type { GraphNode, ObstacleXY, Pos2 } from "./types";
 
 const EPSILON = 1e-9;
 
-type Box2 = {
+export type Box2 = {
   minX: number;
   maxX: number;
   minY: number;
   maxY: number;
 };
+
+export type BoundedObstacleXY = ObstacleXY & {
+  bounds: Box2;
+}
+
 
 function getSegmentBox(a: Pos2, b: Pos2): Box2 {
   return {
@@ -131,15 +136,15 @@ function doesSegmentIntersectPolygon2D(
 export function isValidEdge(
   from: GraphNode,
   to: GraphNode,
-  obstacles: ObstacleXY[],
+  boundedObstacles: BoundedObstacleXY[],
 ): boolean {
   const edgeBox = getSegmentBox(from.pos, to.pos);
 
-  for (const obstacle of obstacles) {
-    const obstacleBox = getPolygonBox(obstacle.points);
+  for (const obstacle of boundedObstacles) {
+    // const obstacleBox = getPolygonBox(obstacle.points);
 
     // Skips lots of slow edge collision checks
-    if (!boxesOverlap(edgeBox, obstacleBox)) {
+    if (!boxesOverlap(edgeBox, obstacle.bounds)) {
       continue;
     }
 
@@ -161,4 +166,11 @@ export function isValidEdge(
   }
 
   return true;
+}
+
+export function generateObstacleBounds(obstacles: ObstacleXY[]): BoundedObstacleXY[] {
+  return obstacles.map((obstacle) => ({
+    ...obstacle,
+    bounds: getPolygonBox(obstacle.points),
+  }));
 }

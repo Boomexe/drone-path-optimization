@@ -1,4 +1,4 @@
-import { isValidEdge } from "./collisionUtils";
+import { generateObstacleBounds, isValidEdge } from "./collisionUtils";
 import { dist3D } from "./coordUtils";
 import type { GraphEdge, GraphNode, ObstacleXY } from "./types";
 
@@ -9,6 +9,7 @@ export function buildGraphEdges(
   obstacles: ObstacleXY[]
 ): GraphEdge[] {
   const edges: GraphEdge[] = [];
+  const boundedObstacles = generateObstacleBounds(obstacles);
 
   let totalPairs = 0;
   let skippedByDistance = 0;
@@ -36,7 +37,7 @@ export function buildGraphEdges(
 
       collisionChecks++;
 
-      if (!isValidEdge(from, to, obstacles)) {
+      if (!isValidEdge(from, to, boundedObstacles)) {
         continue;
       }
 
