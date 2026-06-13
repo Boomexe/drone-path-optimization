@@ -49,6 +49,23 @@ Possible future optimizations:
 - Edge length for edges not directly linked to the start and end is capped at MAX_EDGE_COST for performance.
 - True cost calculations are not taken into account. Here, cost is directly linked to distance, which doesn't account for the fact that horizontal movement, climbing, and falling may all have different time/energy-costs.
 
+## Installation
+Download repo:
+```bash
+git clone https://github.com/Boomexe/drone-path-optimization/
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
+Run prod build:
+```bash
+npm run build
+npm run preview
+```
+
 ## Useful Links
 - [Sebastian Lague A* pathfinding in Unity tutorial](https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW)
 - [Overpass Turbo](https://overpass-turbo.eu) (for getting building GeoJson)
